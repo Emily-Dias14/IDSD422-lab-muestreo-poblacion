@@ -41,7 +41,7 @@ cat("Ciudades en la población: "); print(table(poblacion$ciudad))
 #         Pista: head(poblacion, 20) — igual que la demo de clase.
 #         Después de correrlo, mira la composición por ciudad que imprime el
 #         reporte: ¿es un corte al azar? ¿alguna ciudad falta por completo?
-muestra_conv <- NULL
+muestra_conv <- head(poblacion, 20)
 
 # ---------------------------------------------------------------------------
 # 3. Muestra aleatoria simple: el sorteo de 20
@@ -52,7 +52,18 @@ muestra_conv <- NULL
 # TODO 3: repite el sorteo con las semillas 2 a 5 y anota las 5 medias en el
 #         informe: la variabilidad de la estimación es parte de la lección.
 #         Pista: for (semilla in 1:5) { set.seed(semilla); ... }
-muestra_aas <- NULL
+set.seed(1)
+muestra_aas <- poblacion[sample(nrow(poblacion), 20), ]
+
+medias_semillas <- numeric(5)
+for (semilla in 1:5) {
+  set.seed(semilla)
+  m <- poblacion[sample(nrow(poblacion), 20), ]
+  medias_semillas[semilla] <- mean(m$ingresos_mensuales)
+}
+cat("\nMedias del aleatorio simple por semilla:\n")
+print(data.frame(semilla = 1:5, media = round(medias_semillas, 2)), row.names = FALSE)
+cat(sprintf("Rango de medias: %.2f a %.2f\n\n", min(medias_semillas), max(medias_semillas)))
 
 # ---------------------------------------------------------------------------
 # 4. Muestra estratificada: 5 % dentro de cada ciudad
@@ -62,7 +73,12 @@ muestra_aas <- NULL
 #         Cuenca (20 en total).
 #         Pista: library(dplyr); poblacion |> group_by(ciudad) |> slice_sample(prop = 0.05)
 #         ¿Qué garantiza este diseño que el sorteo simple no garantiza?
-muestra_est <- NULL
+suppressPackageStartupMessages(library(dplyr))
+set.seed(1)
+muestra_est <- poblacion |>
+  group_by(ciudad) |>
+  slice_sample(prop = 0.05) |>
+  ungroup()
 
 # ---------------------------------------------------------------------------
 # 5. Comparación final
